@@ -1,7 +1,6 @@
 #include "header.h"
 #include "functions.cpp"
 #include <iostream>
-#include <memory>
 
 template <typename T>
 void ProcessArray(int fillChoice, int32_t size) {

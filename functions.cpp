@@ -5,9 +5,7 @@
 #include <random>
 #include <algorithm>
 #include <cmath>
-#include <unordered_set>
 
-// Общие функции
 void InputSize(int32_t& size) {
     std::cout << "Input size: ";
     if (!(std::cin >> size) || size <= 0) {
@@ -17,11 +15,16 @@ void InputSize(int32_t& size) {
 
 // Функции для int32_t
 void CreateArray(int32_t*& array, int32_t size) {
-    array = new int32_t[size](); // Инициализация нулями
+    if (size <= 0) {
+        throw std::invalid_argument("Size must be positive");
+    }
+    array = new int32_t[size]();
 }
 
 void FillArray(int32_t* array, int32_t size) {
-    if (!array) throw std::invalid_argument("Array is nullptr");
+    if (!array || size <= 0) {
+        throw std::invalid_argument("Invalid array or size");
+    }
     
     for (int32_t i = 0; i < size; ++i) {
         std::cout << "Enter element " << i+1 << ": ";
@@ -32,10 +35,12 @@ void FillArray(int32_t* array, int32_t size) {
 }
 
 void FillArrayRandom(int32_t* array, int32_t size) {
-    if (!array) throw std::invalid_argument("Array is nullptr");
+    if (!array || size <= 0) {
+        throw std::invalid_argument("Array is nullptr or size is invalid");
+    }
     
-    std::random_device rd;
-    std::mt19937 gen(rd());
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
     std::uniform_int_distribution<int32_t> dis(-50, 50);
     
     for (int32_t i = 0; i < size; ++i) {
@@ -43,7 +48,7 @@ void FillArrayRandom(int32_t* array, int32_t size) {
     }
 }
 
-int32_t MinFabsElement(int32_t* array, int32_t size) {
+int32_t MinFabsElement(const int32_t* array, int32_t size) {
     if (!array || size <= 0) {
         throw std::invalid_argument("Invalid array");
     }
@@ -57,10 +62,10 @@ int32_t MinFabsElement(int32_t* array, int32_t size) {
     return array[minIndex];
 }
 
-bool SumBetweenZeros(int32_t* arr, int32_t size, int32_t& result) {
+bool SumBetweenZeros(const int32_t* arr, int32_t size, int32_t& result) {
     result = 0;
     if (!arr || size <= 0) {
-        return false;
+        throw std::invalid_argument("Invalid array");
     }
     
     int firstZero = -1;
@@ -108,9 +113,9 @@ void EvenSortArray(int32_t* array, int32_t size) {
     delete[] temp;
 }
 
-void PrintArray(int32_t* array, int32_t size) {
-    if (!array) {
-        throw std::invalid_argument("Array is nullptr");
+void PrintArray(const int32_t* array, int32_t size) {
+    if (!array || size <= 0) {
+        throw std::invalid_argument("Array is nullptr or size is invalid");
     }
     
     std::cout << "Array: ";
@@ -127,11 +132,16 @@ void DeleteArray(int32_t*& array) {
 
 // Функции для double
 void CreateArray(double*& array, int32_t size) {
-    array = new double[size](); // Инициализация нулями
+    if (size <= 0) {
+        throw std::invalid_argument("Size must be positive");
+    }
+    array = new double[size]();
 }
 
 void FillArray(double* array, int32_t size) {
-    if (!array) throw std::invalid_argument("Array is nullptr");
+    if (!array || size <= 0) {
+        throw std::invalid_argument("Invalid array or size");
+    }
     
     for (int32_t i = 0; i < size; ++i) {
         std::cout << "Enter element " << i+1 << ": ";
@@ -142,10 +152,12 @@ void FillArray(double* array, int32_t size) {
 }
 
 void FillArrayRandom(double* array, int32_t size) {
-    if (!array) throw std::invalid_argument("Array is nullptr");
+    if (!array || size <= 0) {
+        throw std::invalid_argument("Array is nullptr or size is invalid");
+    }
     
-    std::random_device rd;
-    std::mt19937 gen(rd());
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
     std::uniform_real_distribution<double> dis(-10.0, 10.0);
     
     for (int32_t i = 0; i < size; ++i) {
@@ -153,28 +165,34 @@ void FillArrayRandom(double* array, int32_t size) {
     }
 }
 
-int32_t CountUniqueElements(double* array, int32_t size) {
+int32_t CountUniqueElements(const int32_t* array, int32_t size) {
     if (!array || size <= 0) {
         throw std::invalid_argument("Invalid array");
     }
-    
-    std::unordered_set<int32_t> uniqueElements;
-    const double epsilon = 1e-9;
-    
+
+    int32_t uniqueCount = 0;
+
     for (int32_t i = 0; i < size; ++i) {
         bool isUnique = true;
         for (int32_t j = 0; j < i; ++j) {
-            if (std::abs(array[i] - array[j]) < epsilon) {
+            if (array[i] == array[j]) {
                 isUnique = false;
                 break;
             }
         }
+
+        if (isUnique) {
+            uniqueCount++;
+        }
     }
-    return uniqueElements.size();
+
+    return uniqueCount;
 }
 
-double ProductBeforeMinAbs(double* array, int32_t size) {
-    if (!array || size <= 0) return 0.0;
+double ProductBeforeMinAbs(const double* array, int32_t size) {
+    if (!array || size <= 0) {
+        throw std::invalid_argument("Invalid array");
+    }
     
     int32_t minIndex = 0;
     for (int32_t i = 1; i < size; ++i) {
@@ -193,30 +211,28 @@ double ProductBeforeMinAbs(double* array, int32_t size) {
 }
 
 void RearrangeArray(double* array, int32_t size) {
-    if (!array || size <= 1) return;
-    
-    double* temp = new double[size];
-    int32_t negIndex = 0;
-    int32_t zeroIndex = 0;
-    int32_t posIndex = 0;
-    
-    // Сначала считаем количество элементов каждого типа
-    for (int32_t i = 0; i < size; ++i) {
-        if (array[i] < 0) negIndex++;
-        else if (array[i] == 0) zeroIndex++;
-        else posIndex++;
+    if (!array || size <= 1) {
+        throw std::invalid_argument("Invalid array");
     }
     
-    // Вычисляем начальные индексы для каждого типа
-    zeroIndex = negIndex;
-    posIndex = negIndex + zeroIndex;
+    double* temp = new double[size];
+    int32_t negCount = 0;
+    int32_t zeroCount = 0;
+    int32_t posCount = 0;
     
-    // Сбрасываем индексы для заполнения
-    negIndex = 0;
-    zeroIndex = negIndex;
-    posIndex = negIndex + zeroIndex;
+    // Сначала подсчитываем количество каждого типа элементов
+    for (int32_t i = 0; i < size; ++i) {
+        if (array[i] < 0) negCount++;
+        else if (array[i] == 0) zeroCount++;
+        else posCount++;
+    }
     
-    // Заполняем временный массив
+    // Устанавливаем границы для каждого раздела
+    int32_t negIndex = 0;
+    int32_t zeroIndex = negCount;
+    int32_t posIndex = negCount + zeroCount;
+    
+    // Распределяем элементы по соответствующим разделам
     for (int32_t i = 0; i < size; ++i) {
         if (array[i] < 0) {
             temp[negIndex++] = array[i];
@@ -233,9 +249,9 @@ void RearrangeArray(double* array, int32_t size) {
     delete[] temp;
 }
 
-void PrintArray(double* array, int32_t size) {
-    if (!array) {
-        throw std::invalid_argument("Array is nullptr");
+void PrintArray(const double* array, int32_t size) {
+    if (!array || size <= 0) {
+        throw std::invalid_argument("Array is nullptr or size is invalid");
     }
     
     std::cout << "Array: ";
