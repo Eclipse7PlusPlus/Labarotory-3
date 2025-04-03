@@ -227,12 +227,11 @@ void RearrangeArray(double* array, int32_t size) {
         else posCount++;
     }
     
-    // Устанавливаем границы для каждого раздела
+ 
     int32_t negIndex = 0;
     int32_t zeroIndex = negCount;
     int32_t posIndex = negCount + zeroCount;
-    
-    // Распределяем элементы по соответствующим разделам
+   
     for (int32_t i = 0; i < size; ++i) {
         if (array[i] < 0) {
             temp[negIndex++] = array[i];
