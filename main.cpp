@@ -16,7 +16,7 @@ int main() {
             break;
         default:
             std::cout << "Invalid choice\n";
-            return;
+            break;
     }
 
     return 0;
