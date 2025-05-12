@@ -3,7 +3,6 @@
 #include <cstdlib>
 #include <ctime>
 #include <cmath>
-#include <climits>
 
 // ================ Общие функции ================
 
